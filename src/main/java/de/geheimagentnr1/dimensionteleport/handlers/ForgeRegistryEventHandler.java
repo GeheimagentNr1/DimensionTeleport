@@ -6,6 +6,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 
 
+@SuppressWarnings( { "WeakerAccess", "unused", "RedundantSuppression" } )
 @Mod.EventBusSubscriber( bus = Mod.EventBusSubscriber.Bus.FORGE )
 public class ForgeRegistryEventHandler {
 	
