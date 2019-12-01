@@ -56,45 +56,23 @@ public class DimensionTeleportCommand {
 		dispatcher.register( tpd );
 	}
 	
-	@SuppressWarnings( { "DuplicatedCode", "MismatchedQueryAndUpdateOfCollection" } )
 	private static int teleportToPos( CommandContext<CommandSource> context ) throws CommandSyntaxException {
 		
-		CommandSource source = context.getSource();
-		Collection<? extends Entity> targets = EntityArgument.getEntities( context, "targets" );
-		ILocationArgument destinationPos = Vec3Argument.getLocation( context, "location" );
-		Vec3d destination = destinationPos.getPosition( source );
-		Set<SPlayerPositionLookPacket.Flags> relativeList = EnumSet.noneOf( SPlayerPositionLookPacket.Flags.class );
-		if( destinationPos.isXRelative() ) {
-			relativeList.add( SPlayerPositionLookPacket.Flags.X );
-		}
-		if( destinationPos.isYRelative() ) {
-			relativeList.add( SPlayerPositionLookPacket.Flags.Y );
-		}
-		if( destinationPos.isZRelative() ) {
-			relativeList.add( SPlayerPositionLookPacket.Flags.Z );
-		}
-		for( Entity target : targets ) {
-			teleport( target, target.dimension, destination.x, destination.y, destination.z,
-				EnumSet.noneOf( SPlayerPositionLookPacket.Flags.class ), target.rotationYaw,
-				target.rotationPitch );
-		}
-		if( targets.size() == 1 ) {
-			source.sendFeedback( new TranslationTextComponent( "commands.teleport.success.location.single",
-				targets.iterator().next().getDisplayName(), destination.x, destination.y, destination.z ), true );
-		} else {
-			source.sendFeedback( new TranslationTextComponent( "commands.teleport.success.location.multiple",
-				targets.size(), destination.x, destination.y, destination.z ), true );
-		}
-		return targets.size();
+		return teleportToPos( context, target -> target.dimension );
 	}
 	
-	@SuppressWarnings( { "DuplicatedCode", "MismatchedQueryAndUpdateOfCollection" } )
 	private static int teleportToPosWithDim( CommandContext<CommandSource> context ) throws CommandSyntaxException {
+		
+		DimensionType destination_dimension = DimensionArgument.func_212592_a( context, "dimension" );
+		return teleportToPos( context, target -> destination_dimension );
+	}
+	
+	private static int teleportToPos( CommandContext<CommandSource> context, TargetListener targetListener )
+		throws CommandSyntaxException {
 		
 		CommandSource source = context.getSource();
 		Collection<? extends Entity> targets = EntityArgument.getEntities( context, "targets" );
 		ILocationArgument destinationPos = Vec3Argument.getLocation( context, "location" );
-		DimensionType destination_dimension = DimensionArgument.func_212592_a( context, "dimension" );
 		Vec3d destination = destinationPos.getPosition( source );
 		Set<SPlayerPositionLookPacket.Flags> relativeList = EnumSet.noneOf( SPlayerPositionLookPacket.Flags.class );
 		if( destinationPos.isXRelative() ) {
@@ -107,8 +85,8 @@ public class DimensionTeleportCommand {
 			relativeList.add( SPlayerPositionLookPacket.Flags.Z );
 		}
 		for( Entity target : targets ) {
-			teleport( target, destination_dimension, destination.x, destination.y, destination.z,
-				EnumSet.noneOf( SPlayerPositionLookPacket.Flags.class ), target.rotationYaw,
+			teleport( target, targetListener.getTargetDimension( target ), destination.x, destination.y, destination.z,
+				relativeList, target.rotationYaw,
 				target.rotationPitch );
 		}
 		if( targets.size() == 1 ) {

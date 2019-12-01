@@ -8,5 +8,6 @@ public class DimensionTeleport {
 	
 	
 	//package-private
+	@SuppressWarnings( { "WeakerAccess", "RedundantSuppression" } )
 	final static String MODID = "dimensionteleport";
 }
