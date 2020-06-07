@@ -91,10 +91,11 @@ public class DimensionTeleportCommand {
 		CommandSource source = context.getSource();
 		Collection<? extends Entity> targets = EntityArgument.getEntities( context, "targets" );
 		Entity destination = EntityArgument.getEntity( context, "destination" );
+		BlockPos destinationPos = destination.getPosition();
 		
 		for( Entity target : targets ) {
-			teleport( target, destination.dimension, destination.posX, destination.posY, destination.posZ,
-				destination.rotationYaw, destination.rotationPitch );
+			teleport( target, destination.dimension, destinationPos.getX(), destinationPos.getY(),
+				destinationPos.getZ(), destination.rotationYaw, destination.rotationPitch );
 		}
 		if( targets.size() == 1 ) {
 			source.sendFeedback( new TranslationTextComponent( "commands.teleport.success.entity.single",
@@ -109,16 +110,16 @@ public class DimensionTeleportCommand {
 	private static void teleport( Entity entity, DimensionType dimension, double x, double y,
 		double z, float yaw, float pitch ) {
 		
-		ServerWorld destination_world = Objects.requireNonNull( entity.getServer() ).func_71218_a( dimension );
+		ServerWorld destination_world = Objects.requireNonNull( entity.getServer() ).getWorld( dimension );
 		if( entity instanceof ServerPlayerEntity ) {
 			ServerPlayerEntity player = (ServerPlayerEntity)entity;
-			destination_world.getChunkProvider().func_217228_a( TicketType.POST_TELEPORT,
+			destination_world.getChunkProvider().registerTicket( TicketType.POST_TELEPORT,
 				new ChunkPos( new BlockPos( x, y, z ) ), 1, entity.getEntityId() );
 			player.stopRiding();
 			if( player.isSleeping() ) {
-				player.wakeUpPlayer( true, true, false );
+				player.stopSleepInBed( true, true );
 			}
-			player.func_200619_a( destination_world, x, y, z, yaw, pitch );
+			player.teleport( destination_world, x, y, z, yaw, pitch );
 			player.setRotationYawHead( yaw );
 		} else {
 			yaw = MathHelper.wrapDegrees( yaw );
