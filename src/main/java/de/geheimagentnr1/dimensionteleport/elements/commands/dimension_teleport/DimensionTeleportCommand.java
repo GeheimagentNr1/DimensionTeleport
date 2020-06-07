@@ -6,14 +6,12 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
+import net.minecraft.command.arguments.BlockPosArgument;
 import net.minecraft.command.arguments.DimensionArgument;
 import net.minecraft.command.arguments.EntityArgument;
-import net.minecraft.command.arguments.ILocationArgument;
-import net.minecraft.command.arguments.Vec3Argument;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.play.server.SPlayerPositionLookPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
@@ -25,9 +23,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
 
 import java.util.Collection;
-import java.util.EnumSet;
 import java.util.Objects;
-import java.util.Set;
 
 
 public class DimensionTeleportCommand {
@@ -45,7 +41,7 @@ public class DimensionTeleportCommand {
 			return 1;
 		} );
 		tpd.then( Commands.argument( "targets", EntityArgument.entities() )
-			.then( Commands.argument( "location", Vec3Argument.vec3() )
+			.then( Commands.argument( "location", BlockPosArgument.blockPos() )
 				.executes(
 					DimensionTeleportCommand::teleportToPos
 				).then( Commands.argument( "dimension", DimensionArgument.getDimension() ).executes(
@@ -63,7 +59,7 @@ public class DimensionTeleportCommand {
 	
 	private static int teleportToPosWithDim( CommandContext<CommandSource> context ) throws CommandSyntaxException {
 		
-		DimensionType destination_dimension = DimensionArgument.func_212592_a( context, "dimension" );
+		DimensionType destination_dimension = DimensionArgument.getDimensionArgument( context, "dimension" );
 		return teleportToPos( context, target -> destination_dimension );
 	}
 	
@@ -72,29 +68,20 @@ public class DimensionTeleportCommand {
 		
 		CommandSource source = context.getSource();
 		Collection<? extends Entity> targets = EntityArgument.getEntities( context, "targets" );
-		ILocationArgument destinationPos = Vec3Argument.getLocation( context, "location" );
-		Vec3d destination = destinationPos.getPosition( source );
-		Set<SPlayerPositionLookPacket.Flags> relativeList = EnumSet.noneOf( SPlayerPositionLookPacket.Flags.class );
-		if( destinationPos.isXRelative() ) {
-			relativeList.add( SPlayerPositionLookPacket.Flags.X );
-		}
-		if( destinationPos.isYRelative() ) {
-			relativeList.add( SPlayerPositionLookPacket.Flags.Y );
-		}
-		if( destinationPos.isZRelative() ) {
-			relativeList.add( SPlayerPositionLookPacket.Flags.Z );
-		}
+		BlockPos destinationPos = BlockPosArgument.getBlockPos( context, "location" );
+		Vec3d destination = new Vec3d( destinationPos.getX() + 0.5, destinationPos.getY(),
+			destinationPos.getZ() + 0.5 );
 		for( Entity target : targets ) {
-			teleport( target, targetListener.getTargetDimension( target ), destination.x, destination.y, destination.z,
-				relativeList, target.rotationYaw,
-				target.rotationPitch );
+			teleport( target, targetListener.getTargetDimension( target ), destination.getX(), destination.getY(),
+				destination.getZ(), target.rotationYaw, target.rotationPitch );
 		}
 		if( targets.size() == 1 ) {
 			source.sendFeedback( new TranslationTextComponent( "commands.teleport.success.location.single",
-				targets.iterator().next().getDisplayName(), destination.x, destination.y, destination.z ), true );
+				targets.iterator().next().getDisplayName(), destination.getX(), destination.getY(),
+				destination.getZ() ), true );
 		} else {
 			source.sendFeedback( new TranslationTextComponent( "commands.teleport.success.location.multiple",
-				targets.size(), destination.x, destination.y, destination.z ), true );
+				targets.size(), destination.getX(), destination.getY(), destination.getZ() ), true );
 		}
 		return targets.size();
 	}
@@ -107,8 +94,7 @@ public class DimensionTeleportCommand {
 		
 		for( Entity target : targets ) {
 			teleport( target, destination.dimension, destination.posX, destination.posY, destination.posZ,
-				EnumSet.noneOf( SPlayerPositionLookPacket.Flags.class ), destination.rotationYaw,
-				destination.rotationPitch );
+				destination.rotationYaw, destination.rotationPitch );
 		}
 		if( targets.size() == 1 ) {
 			source.sendFeedback( new TranslationTextComponent( "commands.teleport.success.entity.single",
@@ -121,9 +107,9 @@ public class DimensionTeleportCommand {
 	}
 	
 	private static void teleport( Entity entity, DimensionType dimension, double x, double y,
-		double z, Set<SPlayerPositionLookPacket.Flags> relativeList, float yaw, float pitch ) {
+		double z, float yaw, float pitch ) {
 		
-		ServerWorld destination_world = Objects.requireNonNull( entity.getServer() ).getWorld( dimension );
+		ServerWorld destination_world = Objects.requireNonNull( entity.getServer() ).func_71218_a( dimension );
 		if( entity instanceof ServerPlayerEntity ) {
 			ServerPlayerEntity player = (ServerPlayerEntity)entity;
 			destination_world.getChunkProvider().func_217228_a( TicketType.POST_TELEPORT,
@@ -132,11 +118,7 @@ public class DimensionTeleportCommand {
 			if( player.isSleeping() ) {
 				player.wakeUpPlayer( true, true, false );
 			}
-			if( destination_world == player.world ) {
-				player.connection.setPlayerLocation( x, y, z, yaw, pitch, relativeList );
-			} else {
-				player.teleport( destination_world, x, y, z, yaw, pitch );
-			}
+			player.func_200619_a( destination_world, x, y, z, yaw, pitch );
 			player.setRotationYawHead( yaw );
 		} else {
 			yaw = MathHelper.wrapDegrees( yaw );
