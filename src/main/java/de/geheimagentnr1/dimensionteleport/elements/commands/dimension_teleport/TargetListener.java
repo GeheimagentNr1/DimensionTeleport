@@ -1,13 +1,14 @@
 package de.geheimagentnr1.dimensionteleport.elements.commands.dimension_teleport;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.server.ServerWorld;
 
 
 //package-private
 @FunctionalInterface
 interface TargetListener {
 	
+	
 	//public
-	DimensionType getTargetDimension( Entity target );
+	ServerWorld getTargetDimension( Entity target );
 }

@@ -9,21 +9,20 @@ import net.minecraft.command.Commands;
 import net.minecraft.command.arguments.BlockPosArgument;
 import net.minecraft.command.arguments.DimensionArgument;
 import net.minecraft.command.arguments.EntityArgument;
+import net.minecraft.entity.CreatureEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
 
 import java.util.Collection;
-import java.util.Objects;
 
 
 public class DimensionTeleportCommand {
@@ -54,13 +53,13 @@ public class DimensionTeleportCommand {
 	
 	private static int teleportToPos( CommandContext<CommandSource> context ) throws CommandSyntaxException {
 		
-		return teleportToPos( context, target -> target.dimension );
+		return teleportToPos( context, target -> (ServerWorld)target.getEntityWorld() );
 	}
 	
 	private static int teleportToPosWithDim( CommandContext<CommandSource> context ) throws CommandSyntaxException {
 		
-		DimensionType destination_dimension = DimensionArgument.getDimensionArgument( context, "dimension" );
-		return teleportToPos( context, target -> destination_dimension );
+		ServerWorld destination_world = DimensionArgument.getDimensionArgument( context, "dimension" );
+		return teleportToPos( context, target -> destination_world );
 	}
 	
 	private static int teleportToPos( CommandContext<CommandSource> context, TargetListener targetListener )
@@ -69,7 +68,7 @@ public class DimensionTeleportCommand {
 		CommandSource source = context.getSource();
 		Collection<? extends Entity> targets = EntityArgument.getEntities( context, "targets" );
 		BlockPos destinationPos = BlockPosArgument.getBlockPos( context, "location" );
-		Vec3d destination = new Vec3d( destinationPos.getX() + 0.5, destinationPos.getY(),
+		Vector3d destination = new Vector3d( destinationPos.getX() + 0.5, destinationPos.getY(),
 			destinationPos.getZ() + 0.5 );
 		for( Entity target : targets ) {
 			teleport( target, targetListener.getTargetDimension( target ), destination.getX(), destination.getY(),
@@ -91,10 +90,10 @@ public class DimensionTeleportCommand {
 		CommandSource source = context.getSource();
 		Collection<? extends Entity> targets = EntityArgument.getEntities( context, "targets" );
 		Entity destination = EntityArgument.getEntity( context, "destination" );
-		BlockPos destinationPos = destination.getPosition();
+		BlockPos destinationPos = destination.func_233580_cy_();
 		
 		for( Entity target : targets ) {
-			teleport( target, destination.dimension, destinationPos.getX(), destinationPos.getY(),
+			teleport( target, (ServerWorld)destination.getEntityWorld(), destinationPos.getX(), destinationPos.getY(),
 				destinationPos.getZ(), destination.rotationYaw, destination.rotationPitch );
 		}
 		if( targets.size() == 1 ) {
@@ -107,10 +106,9 @@ public class DimensionTeleportCommand {
 		return targets.size();
 	}
 	
-	private static void teleport( Entity entity, DimensionType dimension, double x, double y,
+	private static void teleport( Entity entity, ServerWorld destination_world, double x, double y,
 		double z, float yaw, float pitch ) {
 		
-		ServerWorld destination_world = Objects.requireNonNull( entity.getServer() ).getWorld( dimension );
 		if( entity instanceof ServerPlayerEntity ) {
 			ServerPlayerEntity player = (ServerPlayerEntity)entity;
 			destination_world.getChunkProvider().registerTicket( TicketType.POST_TELEPORT,
@@ -129,7 +127,10 @@ public class DimensionTeleportCommand {
 		}
 		if( !( entity instanceof LivingEntity ) || !( (LivingEntity)entity ).isElytraFlying() ) {
 			entity.setMotion( entity.getMotion().mul( 1.0D, 0.0D, 1.0D ) );
-			entity.onGround = true;
+			entity.func_230245_c_( true );
+		}
+		if( entity instanceof CreatureEntity ) {
+			( (CreatureEntity)entity ).getNavigator().clearPath();
 		}
 	}
 }
