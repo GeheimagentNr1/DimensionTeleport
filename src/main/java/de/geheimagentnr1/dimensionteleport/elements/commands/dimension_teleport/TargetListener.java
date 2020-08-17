@@ -8,6 +8,7 @@ import net.minecraft.world.dimension.DimensionType;
 @FunctionalInterface
 interface TargetListener {
 	
+	
 	//public
 	DimensionType getTargetDimension( Entity target );
 }
