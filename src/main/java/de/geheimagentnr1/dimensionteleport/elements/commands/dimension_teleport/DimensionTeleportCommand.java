@@ -90,7 +90,7 @@ public class DimensionTeleportCommand {
 		CommandSource source = context.getSource();
 		Collection<? extends Entity> targets = EntityArgument.getEntities( context, "targets" );
 		Entity destination = EntityArgument.getEntity( context, "destination" );
-		BlockPos destinationPos = destination.func_233580_cy_();
+		BlockPos destinationPos = destination.getPosition();
 		
 		for( Entity target : targets ) {
 			teleport( target, (ServerWorld)destination.getEntityWorld(), destinationPos.getX(), destinationPos.getY(),
@@ -127,7 +127,7 @@ public class DimensionTeleportCommand {
 		}
 		if( !( entity instanceof LivingEntity ) || !( (LivingEntity)entity ).isElytraFlying() ) {
 			entity.setMotion( entity.getMotion().mul( 1.0D, 0.0D, 1.0D ) );
-			entity.func_230245_c_( true );
+			entity.setOnGround( true );
 		}
 		if( entity instanceof CreatureEntity ) {
 			( (CreatureEntity)entity ).getNavigator().clearPath();
