@@ -273,21 +273,21 @@
   {
     "project": "asm-util",
     "description": "Utilities for ASM, a very small and fast Java bytecode manipulation framework",
-    "version": "6.2",
+    "version": "7.2",
     "developers": [
       "Eric Bruneton",
       "Eugene Kuleshov",
       "Remi Forax"
     ],
-    "url": "http://asm.ow2.org/",
+    "url": "http://asm.ow2.io/",
     "year": "2000",
     "licenses": [
       {
-        "license": "BSD",
-        "license_url": "http://asm.ow2.org/license.html"
+        "license": "BSD-3-Clause",
+        "license_url": "https://asm.ow2.io/license.html"
       }
     ],
-    "dependency": "org.ow2.asm:asm-util:6.2"
+    "dependency": "org.ow2.asm:asm-util:7.2"
   },
   {
     "project": "authlib",
@@ -395,7 +395,7 @@
   {
     "project": "Event Bus",
     "description": "High performance Event Bus library",
-    "version": "2.2.0",
+    "version": "2.2.1",
     "developers": [
       "cpw",
       "LexManos"
@@ -408,7 +408,7 @@
         "license_url": "https://www.gnu.org/licenses/old-licenses/lgpl-2.1.txt"
       }
     ],
-    "dependency": "net.minecraftforge:eventbus:2.2.0"
+    "dependency": "net.minecraftforge:eventbus:2.2.1"
   },
   {
     "project": "fastutil",
@@ -445,12 +445,12 @@
   {
     "project": "forge",
     "description": null,
-    "version": "1.15.2-31.2.36_mapped_snapshot_20200821-1.15.1",
+    "version": "1.15.2-31.2.49_mapped_snapshot_20210223-1.15.1",
     "developers": [],
     "url": null,
     "year": null,
     "licenses": [],
-    "dependency": "net.minecraftforge:forge:1.15.2-31.2.36_mapped_snapshot_20200821-1.15.1"
+    "dependency": "net.minecraftforge:forge:1.15.2-31.2.49_mapped_snapshot_20210223-1.15.1"
   },
   {
     "project": "Forge Service Provider Interface",
@@ -830,6 +830,21 @@
       }
     ],
     "dependency": "net.minecraftforge:mergetool:1.0.9"
+  },
+  {
+    "project": "mixin",
+    "description": "Mixin",
+    "version": "0.8.2",
+    "developers": [],
+    "url": "http://www.spongepowered.org/",
+    "year": null,
+    "licenses": [
+      {
+        "license": "MIT license",
+        "license_url": "http://opensource.org/licenses/MIT"
+      }
+    ],
+    "dependency": "org.spongepowered:mixin:0.8.2"
   },
   {
     "project": "Mod Launcher",
