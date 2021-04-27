@@ -7,6 +7,5 @@ import net.minecraftforge.fml.common.Mod;
 public class DimensionTeleport {
 	
 	
-	//package-private
-	static final String MODID = "dimensionteleport";
+	public static final String MODID = "dimensionteleport";
 }
