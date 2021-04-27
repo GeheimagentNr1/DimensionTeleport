@@ -32,10 +32,7 @@ public class DimensionTeleportCommand {
 		LiteralArgumentBuilder<CommandSource> tpd = Commands.literal( "tpd" )
 			.requires( commandSource -> commandSource.hasPermissionLevel( 2 ) );
 		tpd.then( Commands.argument( "targets", EntityArgument.entities() )
-			.then( Commands.argument(
-				"location",
-				BlockPosArgument.blockPos()
-			)
+			.then( Commands.argument( "location", BlockPosArgument.blockPos() )
 				.executes( DimensionTeleportCommand::teleportToPos )
 				.then( Commands.argument( "dimension", DimensionArgument.getDimension() )
 					.executes( DimensionTeleportCommand::teleportToPosWithDim ) ) )
