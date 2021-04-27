@@ -115,8 +115,11 @@ public class DimensionTeleportCommand {
 			teleport(
 				target,
 				destination.dimension,
-				destinationPos.getX(), destinationPos.getY(),
-				destinationPos.getZ(), destination.rotationYaw, destination.rotationPitch
+				destinationPos.getX(),
+				destinationPos.getY(),
+				destinationPos.getZ(),
+				destination.rotationYaw,
+				destination.rotationPitch
 			);
 		}
 		if( targets.size() == 1 ) {
