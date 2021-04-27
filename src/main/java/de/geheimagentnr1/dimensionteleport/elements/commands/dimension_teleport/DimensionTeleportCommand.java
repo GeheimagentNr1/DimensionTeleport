@@ -1,6 +1,5 @@
 package de.geheimagentnr1.dimensionteleport.elements.commands.dimension_teleport;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -18,7 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraft.world.server.TicketType;
@@ -29,24 +27,12 @@ import java.util.Collection;
 public class DimensionTeleportCommand {
 	
 	
-	@SuppressWarnings( "SameReturnValue" )
 	public static void register( CommandDispatcher<CommandSource> dispatcher ) {
 		
-		LiteralArgumentBuilder<CommandSource> tpd = Commands.literal( "tpd" ).requires(
-			commandSource -> commandSource.hasPermissionLevel( 2 )
-		);
-		tpd.executes( context -> {
-			context.getSource().sendFeedback(
-				new StringTextComponent( "/tpd <targets> <destination> [<dimension>]" ),
-				true
-			);
-			return Command.SINGLE_SUCCESS;
-		} );
+		LiteralArgumentBuilder<CommandSource> tpd = Commands.literal( "tpd" )
+			.requires( commandSource -> commandSource.hasPermissionLevel( 2 ) );
 		tpd.then( Commands.argument( "targets", EntityArgument.entities() )
-			.then( Commands.argument(
-				"location",
-				BlockPosArgument.blockPos()
-			)
+			.then( Commands.argument( "location", BlockPosArgument.blockPos() )
 				.executes( DimensionTeleportCommand::teleportToPos )
 				.then( Commands.argument( "dimension", DimensionArgument.getDimension() )
 					.executes( DimensionTeleportCommand::teleportToPosWithDim ) ) )
@@ -89,21 +75,27 @@ public class DimensionTeleportCommand {
 			);
 		}
 		if( targets.size() == 1 ) {
-			source.sendFeedback( new TranslationTextComponent(
-				"commands.teleport.success.location.single",
-				targets.iterator().next().getDisplayName(),
-				destination.getX(),
-				destination.getY(),
-				destination.getZ()
-			), true );
+			source.sendFeedback(
+				new TranslationTextComponent(
+					"commands.teleport.success.location.single",
+					targets.iterator().next().getDisplayName(),
+					destination.getX(),
+					destination.getY(),
+					destination.getZ()
+				),
+				true
+			);
 		} else {
-			source.sendFeedback( new TranslationTextComponent(
-				"commands.teleport.success.location.multiple",
-				targets.size(),
-				destination.getX(),
-				destination.getY(),
-				destination.getZ()
-			), true );
+			source.sendFeedback(
+				new TranslationTextComponent(
+					"commands.teleport.success.location.multiple",
+					targets.size(),
+					destination.getX(),
+					destination.getY(),
+					destination.getZ()
+				),
+				true
+			);
 		}
 		return targets.size();
 	}
@@ -116,29 +108,46 @@ public class DimensionTeleportCommand {
 		BlockPos destinationPos = destination.getPosition();
 		
 		for( Entity target : targets ) {
-			teleport( target, (ServerWorld)destination.getEntityWorld(), destinationPos.getX(), destinationPos.getY(),
-				destinationPos.getZ(), destination.rotationYaw, destination.rotationPitch
+			teleport(
+				target,
+				(ServerWorld)destination.getEntityWorld(),
+				destinationPos.getX(),
+				destinationPos.getY(),
+				destinationPos.getZ(),
+				destination.rotationYaw,
+				destination.rotationPitch
 			);
 		}
 		if( targets.size() == 1 ) {
-			source.sendFeedback( new TranslationTextComponent(
-				"commands.teleport.success.entity.single",
-				targets.iterator().next().getDisplayName(),
-				destination.getDisplayName()
-			), true );
+			source.sendFeedback(
+				new TranslationTextComponent(
+					"commands.teleport.success.entity.single",
+					targets.iterator().next().getDisplayName(),
+					destination.getDisplayName()
+				),
+				true
+			);
 		} else {
-			source.sendFeedback( new TranslationTextComponent(
-				"commands.teleport.success.entity.multiple",
-				targets.size(),
-				destination.getDisplayName()
-			), true );
+			source.sendFeedback(
+				new TranslationTextComponent(
+					"commands.teleport.success.entity.multiple",
+					targets.size(),
+					destination.getDisplayName()
+				),
+				true
+			);
 		}
 		return targets.size();
 	}
 	
 	private static void teleport(
-		Entity entity, ServerWorld destination_world, double x, double y,
-		double z, float yaw, float pitch ) {
+		Entity entity,
+		ServerWorld destination_world,
+		double x,
+		double y,
+		double z,
+		float yaw,
+		float pitch ) {
 		
 		if( entity instanceof ServerPlayerEntity ) {
 			ServerPlayerEntity player = (ServerPlayerEntity)entity;
