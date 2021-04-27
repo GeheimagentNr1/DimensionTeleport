@@ -1,6 +1,5 @@
 package de.geheimagentnr1.dimensionteleport.elements.commands.dimension_teleport;
 
-import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
@@ -17,7 +16,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
@@ -30,19 +28,10 @@ import java.util.Objects;
 public class DimensionTeleportCommand {
 	
 	
-	@SuppressWarnings( "SameReturnValue" )
 	public static void register( CommandDispatcher<CommandSource> dispatcher ) {
 		
-		LiteralArgumentBuilder<CommandSource> tpd = Commands.literal( "tpd" ).requires(
-			commandSource -> commandSource.hasPermissionLevel( 2 )
-		);
-		tpd.executes( context -> {
-			context.getSource().sendFeedback(
-				new StringTextComponent( "/tpd <targets> <destination> [<dimension>]" ),
-				true
-			);
-			return Command.SINGLE_SUCCESS;
-		} );
+		LiteralArgumentBuilder<CommandSource> tpd = Commands.literal( "tpd" )
+			.requires( commandSource -> commandSource.hasPermissionLevel( 2 ) );
 		tpd.then( Commands.argument( "targets", EntityArgument.entities() )
 			.then( Commands.argument(
 				"location",
@@ -90,21 +79,27 @@ public class DimensionTeleportCommand {
 			);
 		}
 		if( targets.size() == 1 ) {
-			source.sendFeedback( new TranslationTextComponent(
-				"commands.teleport.success.location.single",
-				targets.iterator().next().getDisplayName(),
-				destination.getX(),
-				destination.getY(),
-				destination.getZ()
-			), true );
+			source.sendFeedback(
+				new TranslationTextComponent(
+					"commands.teleport.success.location.single",
+					targets.iterator().next().getDisplayName(),
+					destination.getX(),
+					destination.getY(),
+					destination.getZ()
+				),
+				true
+			);
 		} else {
-			source.sendFeedback( new TranslationTextComponent(
-				"commands.teleport.success.location.multiple",
-				targets.size(),
-				destination.getX(),
-				destination.getY(),
-				destination.getZ()
-			), true );
+			source.sendFeedback(
+				new TranslationTextComponent(
+					"commands.teleport.success.location.multiple",
+					targets.size(),
+					destination.getX(),
+					destination.getY(),
+					destination.getZ()
+				),
+				true
+			);
 		}
 		return targets.size();
 	}
@@ -116,29 +111,46 @@ public class DimensionTeleportCommand {
 		Entity destination = EntityArgument.getEntity( context, "destination" );
 		
 		for( Entity target : targets ) {
-			teleport( target, destination.dimension, destination.posX, destination.posY, destination.posZ,
-				destination.rotationYaw, destination.rotationPitch
+			teleport(
+				target,
+				destination.dimension,
+				destination.posX,
+				destination.posY,
+				destination.posZ,
+				destination.rotationYaw,
+				destination.rotationPitch
 			);
 		}
 		if( targets.size() == 1 ) {
-			source.sendFeedback( new TranslationTextComponent(
-				"commands.teleport.success.entity.single",
-				targets.iterator().next().getDisplayName(),
-				destination.getDisplayName()
-			), true );
+			source.sendFeedback(
+				new TranslationTextComponent(
+					"commands.teleport.success.entity.single",
+					targets.iterator().next().getDisplayName(),
+					destination.getDisplayName()
+				),
+				true
+			);
 		} else {
-			source.sendFeedback( new TranslationTextComponent(
-				"commands.teleport.success.entity.multiple",
-				targets.size(),
-				destination.getDisplayName()
-			), true );
+			source.sendFeedback(
+				new TranslationTextComponent(
+					"commands.teleport.success.entity.multiple",
+					targets.size(),
+					destination.getDisplayName()
+				),
+				true
+			);
 		}
 		return targets.size();
 	}
 	
 	private static void teleport(
-		Entity entity, DimensionType dimension, double x, double y,
-		double z, float yaw, float pitch ) {
+		Entity entity,
+		DimensionType dimension,
+		double x,
+		double y,
+		double z,
+		float yaw,
+		float pitch ) {
 		
 		ServerWorld destination_world = Objects.requireNonNull( entity.getServer() ).func_71218_a( dimension );
 		if( entity instanceof ServerPlayerEntity ) {
