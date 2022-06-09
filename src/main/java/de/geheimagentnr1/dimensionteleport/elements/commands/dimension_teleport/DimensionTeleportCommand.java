@@ -11,7 +11,7 @@ import net.minecraft.commands.arguments.DimensionArgument;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.TicketType;
@@ -32,7 +32,7 @@ public class DimensionTeleportCommand {
 	
 	
 	private static final SimpleCommandExceptionType INVALID_POSITION =
-		new SimpleCommandExceptionType( new TranslatableComponent( "commands.teleport.invalidPosition" ) );
+		new SimpleCommandExceptionType( Component.translatable( "commands.teleport.invalidPosition" ) );
 	
 	public static void register( CommandDispatcher<CommandSourceStack> dispatcher ) {
 		
@@ -80,7 +80,7 @@ public class DimensionTeleportCommand {
 		}
 		if( targets.size() == 1 ) {
 			source.sendSuccess(
-				new TranslatableComponent(
+				Component.translatable(
 					"commands.teleport.success.location.single",
 					targets.iterator().next().getDisplayName(),
 					destination.x(),
@@ -91,7 +91,7 @@ public class DimensionTeleportCommand {
 			);
 		} else {
 			source.sendSuccess(
-				new TranslatableComponent(
+				Component.translatable(
 					"commands.teleport.success.location.multiple",
 					targets.size(),
 					destination.x(),
@@ -124,7 +124,7 @@ public class DimensionTeleportCommand {
 		}
 		if( targets.size() == 1 ) {
 			source.sendSuccess(
-				new TranslatableComponent(
+				Component.translatable(
 					"commands.teleport.success.entity.single",
 					targets.iterator().next().getDisplayName(),
 					destination.getDisplayName()
@@ -133,7 +133,7 @@ public class DimensionTeleportCommand {
 			);
 		} else {
 			source.sendSuccess(
-				new TranslatableComponent(
+				Component.translatable(
 					"commands.teleport.success.entity.multiple",
 					targets.size(),
 					destination.getDisplayName()
