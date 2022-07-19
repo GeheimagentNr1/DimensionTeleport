@@ -65,7 +65,7 @@ public class DimensionTeleportCommand {
 		
 		CommandSourceStack source = context.getSource();
 		Collection<? extends Entity> targets = EntityArgument.getEntities( context, "targets" );
-		BlockPos destinationPos = BlockPosArgument.getLoadedBlockPos( context, "location" );
+		BlockPos destinationPos = BlockPosArgument.getSpawnablePos( context, "location" );
 		Vec3 destination = new Vec3( destinationPos.getX() + 0.5, destinationPos.getY(), destinationPos.getZ() + 0.5 );
 		for( Entity target : targets ) {
 			teleport(
