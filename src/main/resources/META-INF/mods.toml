@@ -63,3 +63,9 @@ Adds an interdimensional teleport command.
     versionRange="[1.19.3]"
     ordering="NONE"
     side="BOTH"
+#[[dependencies.dimensionteleport]]
+#    modId="examplemod"
+#    mandatory=true
+#    versionRange="[1.0,)"
+#    ordering="NONE"
+#    side="BOTH"

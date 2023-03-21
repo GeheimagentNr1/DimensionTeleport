@@ -124,15 +124,15 @@ FindBugs-jsr305 (3.0.2) - The Apache Software License, Version 2.0
 JSR305 Annotations for Findbugs
 http://findbugs.sourceforge.net/
 
-fmlcore (1.19.3-44.0.30) - LGPL 2.1
+fmlcore (1.19.3-44.0.40) - LGPL 2.1
 Modifactions to Minecraft to enable mod developers.
 https://github.com/MinecraftForge/MinecraftForge
 
-fmlloader (1.19.3-44.0.30) - LGPL 2.1
+fmlloader (1.19.3-44.0.40) - LGPL 2.1
 Modifactions to Minecraft to enable mod developers.
 https://github.com/MinecraftForge/MinecraftForge
 
-forge (1.19.3-44.0.30_mapped_official_1.19.3)
+forge (1.19.3-44.0.40_mapped_official_1.19.3)
 
 Forge Service Provider Interface (6.0.0) - LGPLv2.1
 API for services which can plug into forge, or which are used by forge in other places
@@ -210,7 +210,7 @@ https://github.com/shannah/Java-Objective-C-Bridge
 
 javabridge (2.0.25)
 
-javafmllanguage (1.19.3-44.0.30) - LGPL 2.1
+javafmllanguage (1.19.3-44.0.40) - LGPL 2.1
 Modifactions to Minecraft to enable mod developers.
 https://github.com/MinecraftForge/MinecraftForge
 
@@ -236,7 +236,7 @@ http://jsonp.java.net
 
 logging (1.1.1)
 
-lowcodelanguage (1.19.3-44.0.30) - LGPL 2.1
+lowcodelanguage (1.19.3-44.0.40) - LGPL 2.1
 Modifactions to Minecraft to enable mod developers.
 https://github.com/MinecraftForge/MinecraftForge
 
@@ -272,7 +272,7 @@ mappings_official (1.19.3)
 
 Maven Artifact (3.8.5) - Apache License, Version 2.0
 
-mclanguage (1.19.3-44.0.30) - LGPL 2.1
+mclanguage (1.19.3-44.0.40) - LGPL 2.1
 Modifactions to Minecraft to enable mod developers.
 https://github.com/MinecraftForge/MinecraftForge
 
