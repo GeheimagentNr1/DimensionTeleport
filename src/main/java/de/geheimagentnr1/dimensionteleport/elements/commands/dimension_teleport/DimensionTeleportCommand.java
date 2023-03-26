@@ -160,12 +160,12 @@ public class DimensionTeleportCommand {
 		x = event.getTargetX();
 		y = event.getTargetY();
 		z = event.getTargetZ();
-		BlockPos blockpos = new BlockPos( x, y, z );
+		BlockPos blockpos = BlockPos.containing( x, y, z );
 		if( Level.isInSpawnableBounds( blockpos ) ) {
 			yaw = Mth.wrapDegrees( yaw );
 			pitch = Mth.wrapDegrees( pitch );
 			if( entity instanceof ServerPlayer player ) {
-				ChunkPos chunkpos = new ChunkPos( new BlockPos( x, y, z ) );
+				ChunkPos chunkpos = new ChunkPos( blockpos );
 				destination_level.getChunkSource().addRegionTicket(
 					TicketType.POST_TELEPORT,
 					chunkpos,
