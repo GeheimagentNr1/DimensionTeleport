@@ -80,7 +80,7 @@ public class DimensionTeleportCommand {
 		}
 		if( targets.size() == 1 ) {
 			source.sendSuccess(
-				Component.translatable(
+				() -> Component.translatable(
 					"commands.teleport.success.location.single",
 					targets.iterator().next().getDisplayName(),
 					destination.x(),
@@ -91,7 +91,7 @@ public class DimensionTeleportCommand {
 			);
 		} else {
 			source.sendSuccess(
-				Component.translatable(
+				() -> Component.translatable(
 					"commands.teleport.success.location.multiple",
 					targets.size(),
 					destination.x(),
@@ -124,7 +124,7 @@ public class DimensionTeleportCommand {
 		}
 		if( targets.size() == 1 ) {
 			source.sendSuccess(
-				Component.translatable(
+				() -> Component.translatable(
 					"commands.teleport.success.entity.single",
 					targets.iterator().next().getDisplayName(),
 					destination.getDisplayName()
@@ -133,7 +133,7 @@ public class DimensionTeleportCommand {
 			);
 		} else {
 			source.sendSuccess(
-				Component.translatable(
+				() -> Component.translatable(
 					"commands.teleport.success.entity.multiple",
 					targets.size(),
 					destination.getDisplayName()
@@ -176,7 +176,7 @@ public class DimensionTeleportCommand {
 				if( player.isSleeping() ) {
 					player.stopSleepInBed( true, true );
 				}
-				if( destination_level == player.level ) {
+				if( destination_level == player.level() ) {
 					player.connection.teleport( x, y, z, yaw, pitch );
 				} else {
 					player.teleportTo( destination_level, x, y, z, yaw, pitch );
@@ -185,7 +185,7 @@ public class DimensionTeleportCommand {
 				player.onUpdateAbilities();
 			} else {
 				pitch = Mth.clamp( pitch, -90.0F, 90.0F );
-				if( destination_level == entity.level ) {
+				if( destination_level == entity.level() ) {
 					entity.moveTo( x, y, z, yaw, pitch );
 					entity.setYHeadRot( yaw );
 				} else {
