@@ -3,6 +3,7 @@ package de.geheimagentnr1.dimensionteleport.elements.commands.dimension_teleport
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import org.jetbrains.annotations.NotNull;
 
 
 //package-private
@@ -11,5 +12,6 @@ interface TargetListener {
 	
 	
 	//public
-	ServerLevel getTargetDimension( Entity target );
+	@NotNull
+	ServerLevel getTargetDimension( @NotNull Entity target );
 }

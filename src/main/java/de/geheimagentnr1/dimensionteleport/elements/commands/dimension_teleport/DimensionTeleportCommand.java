@@ -1,10 +1,10 @@
 package de.geheimagentnr1.dimensionteleport.elements.commands.dimension_teleport;
 
-import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
+import de.geheimagentnr1.minecraft_forge_api.elements.commands.CommandInterface;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.DimensionArgument;
@@ -24,43 +24,49 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityTeleportEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
 
-public class DimensionTeleportCommand {
+public class DimensionTeleportCommand implements CommandInterface {
 	
 	
+	@NotNull
 	private static final SimpleCommandExceptionType INVALID_POSITION =
 		new SimpleCommandExceptionType( Component.translatable( "commands.teleport.invalidPosition" ) );
 	
-	public static void register( CommandDispatcher<CommandSourceStack> dispatcher ) {
+	@NotNull
+	@Override
+	public LiteralArgumentBuilder<CommandSourceStack> build() {
 		
 		LiteralArgumentBuilder<CommandSourceStack> tpd = Commands.literal( "tpd" )
 			.requires( source -> source.hasPermission( 2 ) );
 		tpd.then( Commands.argument( "targets", EntityArgument.entities() )
 			.then( Commands.argument( "location", BlockPosArgument.blockPos() )
-				.executes( DimensionTeleportCommand::teleportToPos )
+				.executes( this::teleportToPos )
 				.then( Commands.argument( "dimension", DimensionArgument.dimension() )
-					.executes( DimensionTeleportCommand::teleportToPosWithDim ) ) )
+					.executes( this::teleportToPosWithDim ) ) )
 			.then( Commands.argument( "destination", EntityArgument.entity() )
-				.executes( DimensionTeleportCommand::teleportToEntity ) ) );
-		dispatcher.register( tpd );
+				.executes( this::teleportToEntity ) ) );
+		return tpd;
 	}
 	
-	private static int teleportToPos( CommandContext<CommandSourceStack> context ) throws CommandSyntaxException {
+	private int teleportToPos( @NotNull CommandContext<CommandSourceStack> context ) throws CommandSyntaxException {
 		
 		return teleportToPos( context, target -> (ServerLevel)target.getCommandSenderWorld() );
 	}
 	
-	private static int teleportToPosWithDim( CommandContext<CommandSourceStack> context )
+	private int teleportToPosWithDim( @NotNull CommandContext<CommandSourceStack> context )
 		throws CommandSyntaxException {
 		
 		ServerLevel destination_level = DimensionArgument.getDimension( context, "dimension" );
 		return teleportToPos( context, target -> destination_level );
 	}
 	
-	private static int teleportToPos( CommandContext<CommandSourceStack> context, TargetListener targetListener )
+	private int teleportToPos(
+		@NotNull CommandContext<CommandSourceStack> context,
+		@NotNull TargetListener targetListener )
 		throws CommandSyntaxException {
 		
 		CommandSourceStack source = context.getSource();
@@ -104,7 +110,7 @@ public class DimensionTeleportCommand {
 		return targets.size();
 	}
 	
-	private static int teleportToEntity( CommandContext<CommandSourceStack> context ) throws CommandSyntaxException {
+	private int teleportToEntity( @NotNull CommandContext<CommandSourceStack> context ) throws CommandSyntaxException {
 		
 		CommandSourceStack source = context.getSource();
 		Collection<? extends Entity> targets = EntityArgument.getEntities( context, "targets" );
@@ -144,9 +150,9 @@ public class DimensionTeleportCommand {
 		return targets.size();
 	}
 	
-	private static void teleport(
-		Entity entity,
-		ServerLevel destination_level,
+	private void teleport(
+		@NotNull Entity entity,
+		@NotNull ServerLevel destination_level,
 		double x,
 		double y,
 		double z,
