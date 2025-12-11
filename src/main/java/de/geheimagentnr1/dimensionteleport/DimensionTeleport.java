@@ -1,28 +1,28 @@
 package de.geheimagentnr1.dimensionteleport;
 
-import de.geheimagentnr1.dimensionteleport.elements.commands.ModCommandsRegisterFactory;
-import de.geheimagentnr1.minecraft_forge_api.AbstractMod;
-import net.minecraftforge.fml.common.Mod;
+import de.geheimagentnr1.dimensionteleport.elements.commands.dimension_teleport.DimensionTeleportCommand;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.jetbrains.annotations.NotNull;
 
 
 @Mod( DimensionTeleport.MODID )
-public class DimensionTeleport extends AbstractMod {
+public class DimensionTeleport {
 	
 	
 	@NotNull
-	static final String MODID = "dimensionteleport";
+	public static final String MODID = "dimensionteleport";
 	
-	@NotNull
-	@Override
-	public String getModId() {
+	public DimensionTeleport() {
 		
-		return MODID;
+		NeoForge.EVENT_BUS.register( this );
 	}
 	
-	@Override
-	protected void initMod() {
+	@SubscribeEvent
+	public void onRegisterCommands( @NotNull RegisterCommandsEvent event ) {
 		
-		registerEventHandler( new ModCommandsRegisterFactory() );
+		event.getDispatcher().register( new DimensionTeleportCommand().build() );
 	}
 }

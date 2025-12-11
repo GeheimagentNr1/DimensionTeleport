@@ -4,7 +4,6 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.exceptions.SimpleCommandExceptionType;
-import de.geheimagentnr1.minecraft_forge_api.elements.commands.CommandInterface;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.DimensionArgument;
@@ -22,14 +21,14 @@ import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.entity.EntityTeleportEvent;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 
 
-public class DimensionTeleportCommand implements CommandInterface {
+public class DimensionTeleportCommand {
 	
 	
 	@NotNull
@@ -37,7 +36,6 @@ public class DimensionTeleportCommand implements CommandInterface {
 		new SimpleCommandExceptionType( Component.translatable( "commands.teleport.invalidPosition" ) );
 	
 	@NotNull
-	@Override
 	public LiteralArgumentBuilder<CommandSourceStack> build() {
 		
 		LiteralArgumentBuilder<CommandSourceStack> tpd = Commands.literal( "tpd" )
@@ -159,7 +157,7 @@ public class DimensionTeleportCommand implements CommandInterface {
 		float yaw,
 		float pitch ) throws CommandSyntaxException {
 		
-		EntityTeleportEvent.TeleportCommand event = ForgeEventFactory.onEntityTeleportCommand( entity, x, y, z );
+		EntityTeleportEvent.TeleportCommand event = EventHooks.onEntityTeleportCommand( entity, x, y, z );
 		if( event.isCanceled() ) {
 			return;
 		}
