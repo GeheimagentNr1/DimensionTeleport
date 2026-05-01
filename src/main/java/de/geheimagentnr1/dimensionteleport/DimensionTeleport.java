@@ -1,7 +1,9 @@
 package de.geheimagentnr1.dimensionteleport;
 
 import de.geheimagentnr1.dimensionteleport.elements.commands.dimension_teleport.DimensionTeleportCommand;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
@@ -15,7 +17,7 @@ public class DimensionTeleport {
 	@NotNull
 	public static final String MODID = "dimensionteleport";
 	
-	public DimensionTeleport() {
+	public DimensionTeleport( IEventBus modEventBus, ModContainer modContainer ) {
 		
 		NeoForge.EVENT_BUS.register( this );
 	}
