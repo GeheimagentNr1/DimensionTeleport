@@ -13,12 +13,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.server.level.TicketType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
@@ -26,6 +25,7 @@ import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
+import java.util.Set;
 
 
 public class DimensionTeleportCommand {
@@ -169,13 +169,6 @@ public class DimensionTeleportCommand {
 			yaw = Mth.wrapDegrees( yaw );
 			pitch = Mth.wrapDegrees( pitch );
 			if( entity instanceof ServerPlayer player ) {
-				ChunkPos chunkpos = new ChunkPos( blockpos );
-				destination_level.getChunkSource().addRegionTicket(
-					TicketType.POST_TELEPORT,
-					chunkpos,
-					1,
-					player.getId()
-				);
 				player.stopRiding();
 				if( player.isSleeping() ) {
 					player.stopSleepInBed( true, true );
@@ -183,7 +176,7 @@ public class DimensionTeleportCommand {
 				if( destination_level == player.level() ) {
 					player.connection.teleport( x, y, z, yaw, pitch );
 				} else {
-					player.teleportTo( destination_level, x, y, z, yaw, pitch );
+					player.teleportTo( destination_level, x, y, z, Set.<RelativeMovement>of(), yaw, pitch );
 				}
 				player.setYHeadRot( yaw );
 				player.onUpdateAbilities();

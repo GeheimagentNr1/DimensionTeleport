@@ -18,13 +18,20 @@ Keine Mod-Abhängigkeiten - eigenständiger Mod.
 
 ```
 src/main/java/de/geheimagentnr1/dimensionteleport/
-└── DimensionTeleport.java    # Haupt-Mod-Klasse
+├── DimensionTeleport.java                                     # Haupt-Mod-Klasse
+└── elements/
+    ├── commands/
+    │   └── dimension_teleport/
+    │       ├── DimensionTeleportCommand.java                  # /tpd Command-Implementierung
+    │       └── TargetListener.java                            # Callback Interface für Ziel-Dimension
+    └── gametests/
+        └── DimensionTeleportGameTests.java
 ```
 
 ## Besonderheiten
 
-- **Minimaler Mod**: Sehr kleiner Mod mit nur einer Klasse
 - **Server-fokussiert**: DisplayTest ist `IGNORE_SERVER_VERSION`
+- **Teleport-Einschränkung**: Cross-Dimension-Teleport (`player.teleportTo(ServerLevel,...)`) entfernt in MC 1.21.2 → Range begrenzt auf `[1.21.1,1.21.2)`
 
 ## Code-Stil
 
@@ -93,3 +100,7 @@ Der Workflow `.github/workflows/build-and-test.yml` führt automatisch aus:
 | Commands | ✅ | GameTest |
 | Block/Item-Verhalten | ✅ | GameTest |
 | Multi-MC-Version | ⚠️ Pro Branch | CI Matrix |
+
+## Referenzen
+
+- [NeoForge Migration Primer](https://docs.neoforged.net/primer/docs/) — Dokumentiert API-Aenderungen zwischen Minecraft/NeoForge-Versionen; nuetzlich fuer die Pruefung von Breaking Changes beim Upgrade auf neue Versionen
