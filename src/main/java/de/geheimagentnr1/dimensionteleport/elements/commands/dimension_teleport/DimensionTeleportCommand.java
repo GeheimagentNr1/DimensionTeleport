@@ -12,12 +12,10 @@ import net.minecraft.commands.arguments.coordinates.BlockPosArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.event.EventHooks;
@@ -52,7 +50,7 @@ public class DimensionTeleportCommand {
 	
 	private int teleportToPos( @NotNull CommandContext<CommandSourceStack> context ) throws CommandSyntaxException {
 		
-		return teleportToPos( context, target -> (ServerLevel)target.getCommandSenderWorld() );
+		return teleportToPos( context, target -> (ServerLevel)target.level() );
 	}
 	
 	private int teleportToPosWithDim( @NotNull CommandContext<CommandSourceStack> context )
@@ -118,7 +116,7 @@ public class DimensionTeleportCommand {
 		for( Entity target : targets ) {
 			teleport(
 				target,
-				(ServerLevel)destination.getCommandSenderWorld(),
+				(ServerLevel)destination.level(),
 				destinationPos.getX(),
 				destinationPos.getY(),
 				destinationPos.getZ(),
@@ -165,49 +163,28 @@ public class DimensionTeleportCommand {
 		y = event.getTargetY();
 		z = event.getTargetZ();
 		BlockPos blockpos = BlockPos.containing( x, y, z );
-		if( Level.isInSpawnableBounds( blockpos ) ) {
-			yaw = Mth.wrapDegrees( yaw );
-			pitch = Mth.wrapDegrees( pitch );
-			if( entity instanceof ServerPlayer player ) {
-				player.stopRiding();
-				if( player.isSleeping() ) {
-					player.stopSleepInBed( true, true );
-				}
-				if( destination_level == player.level() ) {
-					player.connection.teleport( x, y, z, yaw, pitch );
-				} else {
-					player.teleportTo( destination_level, x, y, z, Set.<RelativeMovement>of(), yaw, pitch );
-				}
-				player.setYHeadRot( yaw );
-				player.onUpdateAbilities();
-			} else {
-				pitch = Mth.clamp( pitch, -90.0F, 90.0F );
-				if( destination_level == entity.level() ) {
-					entity.moveTo( x, y, z, yaw, pitch );
-					entity.setYHeadRot( yaw );
-				} else {
-					entity.unRide();
-					Entity newEntity = entity.getType().create( destination_level );
-					if( newEntity == null ) {
-						return;
-					}
-					
-					newEntity.restoreFrom( entity );
-					newEntity.moveTo( x, y, z, yaw, pitch );
-					newEntity.setYHeadRot( yaw );
-					newEntity.setRemoved( Entity.RemovalReason.CHANGED_DIMENSION );
-					destination_level.addDuringTeleport( entity );
-				}
-			}
-			if( !( entity instanceof LivingEntity ) || !( (LivingEntity)entity ).isFallFlying() ) {
+		if( !Level.isInSpawnableBounds( blockpos ) ) {
+			throw INVALID_POSITION.create();
+		}
+		//Like the vanilla teleport command since 1.21.2: Entity#teleportTo handles players and other entities in the
+		//same and in other dimensions (the former ServerPlayer#teleportTo overloads were removed in 1.21.2)
+		if( entity.teleportTo(
+			destination_level,
+			x,
+			y,
+			z,
+			Set.of(),
+			Mth.wrapDegrees( yaw ),
+			Mth.wrapDegrees( pitch ),
+			true
+		) ) {
+			if( !( entity instanceof LivingEntity livingEntity ) || !livingEntity.isFallFlying() ) {
 				entity.setDeltaMovement( entity.getDeltaMovement().multiply( 1.0D, 0.0D, 1.0D ) );
 				entity.setOnGround( true );
 			}
-			if( entity instanceof PathfinderMob ) {
-				( (PathfinderMob)entity ).getNavigation().stop();
+			if( entity instanceof PathfinderMob pathfinderMob ) {
+				pathfinderMob.getNavigation().stop();
 			}
-		} else {
-			throw INVALID_POSITION.create();
 		}
 	}
 }
