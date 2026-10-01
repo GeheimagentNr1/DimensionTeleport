@@ -2,13 +2,20 @@
 
 ## Projekt-Übersicht
 
-**Dimension Teleport** ist ein NeoForge Minecraft Mod für Minecraft 1.21.1.
+**Dimension Teleport** ist ein NeoForge Minecraft Mod.
 - **Mod ID**: `dimensionteleport`
 - **Package**: `de.geheimagentnr1.dimensionteleport`
-- **Java Version**: 21
-- **NeoForge Version**: 21.1.x
+- **Java Version**: 21 (`develop_26.1`: 25, `jdk-25.0.4.7-hotspot`)
 
-Fügt einen interdimensionalen Teleport-Command hinzu.
+Fügt den Befehl `/tpd <targets> (<location> [<dimension>] | <destination>)` hinzu (Permission-Level 2): Teleport wie `/tp`, aber auch in andere Dimensionen.
+
+| Branch | MC | Range | NeoForge (kompiliert gegen) | Grund für den Schnitt |
+|---|---|---|---|---|
+| `develop_1.21.1` | 1.21.1 | `[1.21.1,1.21.2)` | 21.1.x | |
+| `develop_1.21.2` | 1.21.2 - 1.21.10 | `[1.21.2,1.21.11)` | `21.2.1-beta` | `ServerPlayer.teleportTo(..)`-Überladungen und `RelativeMovement` entfernt: Teleport wie Vanilla-`/tp` seit 1.21.2 über `entity.teleportTo( level, x, y, z, Set.of(), yaw, pitch, true )` (Spieler und andere Entities, gleiche und andere Dimension); `getCommandSenderWorld()` (in 1.21.6 entfernt) → `level()`. Bytecode identisch für 1.21.2 - 1.21.10 |
+| `develop_1.21.11` | 1.21.11 | `[1.21.11,1.21.12)` | `21.11.45` | Aufbauend auf `develop_1.21.2`: `source.hasPermission( 2 )` (in 1.21.11 entfernt) → `Commands.hasPermission( Commands.LEVEL_GAMEMASTERS )` |
+| `develop_26.1` | 26.1 - 26.3 | `[26.1,27)` | `26.1.0.19-beta` (Java 25) | Aufbauend auf `develop_1.21.11`; Tooling Java 25 / Gradle 9.2.1 / moddev 2.0.147 / Lombok 1.18.48. `EventHooks.onEntityTeleportCommand(..)` bekommt die Ziel-Dimension (wie Vanilla-`/tp`). Bytecode identisch für 26.1 - 26.3 |
+
 
 ## Abhängigkeiten
 
@@ -20,12 +27,10 @@ Keine Mod-Abhängigkeiten - eigenständiger Mod.
 src/main/java/de/geheimagentnr1/dimensionteleport/
 ├── DimensionTeleport.java                                     # Haupt-Mod-Klasse
 └── elements/
-    ├── commands/
+    └── commands/
     │   └── dimension_teleport/
     │       ├── DimensionTeleportCommand.java                  # /tpd Command-Implementierung
     │       └── TargetListener.java                            # Callback Interface für Ziel-Dimension
-    └── gametests/
-        └── DimensionTeleportGameTests.java
 ```
 
 ## Besonderheiten
@@ -60,7 +65,7 @@ Verschiedene Java-Versionen sind unter `C:\Program Files\Eclipse Adoptium` insta
 
 ```powershell
 # Java 21 für MC 1.20.5+ (NeoForge)
-$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.9.10-hotspot"
+$env:JAVA_HOME = "C:\Program Files\Eclipse Adoptium\jdk-21.0.12.8-hotspot"
 ./gradlew build
 ```
 
@@ -76,20 +81,17 @@ Tests liegen unter `src/test/java/`. Ergebnisse: `build/reports/tests/test/index
 
 ### NeoForge GameTest Framework
 
-Für Integration Tests in einer echten Minecraft-Umgebung:
+Ab `develop_1.21.2` gibt es keine GameTests mehr (Annotations-Framework ab 1.21.5 entfernt, trivialer Smoke-Test samt Run-Config und CI-Job gelöscht).
 
-```bash
-./gradlew runGameTestServer
-```
+### Ingame-Test
 
-GameTest-Klassen werden mit `@GameTestHolder` annotiert und liegen unter `src/main/java/.../elements/gametests/`.
+`/tpd @s ~ ~ ~ minecraft:the_nether`, zurück per `/tpd @s <x> <y> <z> minecraft:overworld`, eine Entity (z. B. Kuh) in eine andere Dimension, mehrere Ziele (`@e[type=cow]`), auf eine andere Entity (`/tpd @s <Spieler>`), ungültige Position (außerhalb der Welt) gibt die Vanilla-Fehlermeldung. Die Rotation bleibt erhalten, gleitende Spieler (Elytra) behalten ihren Schwung.
 
 ### CI/CD (GitHub Actions)
 
 Der Workflow `.github/workflows/build-and-test.yml` führt automatisch aus:
 1. **Build**: Kompiliert den Mod
 2. **Unit Tests**: Führt JUnit Tests aus
-3. **GameTests**: Startet GameTestServer (optional)
 
 ### Was kann automatisiert getestet werden?
 
@@ -104,3 +106,9 @@ Der Workflow `.github/workflows/build-and-test.yml` führt automatisch aus:
 ## Referenzen
 
 - [NeoForge Migration Primer](https://docs.neoforged.net/primer/docs/) — Dokumentiert API-Aenderungen zwischen Minecraft/NeoForge-Versionen; nuetzlich fuer die Pruefung von Breaking Changes beim Upgrade auf neue Versionen
+
+---
+
+## Wissensdatenbank
+
+Versionsübergreifende Migrations- und Entwicklungs-Erkenntnisse (Breaking Changes, Fixes, Testumgebungs-Patterns) werden zentral in [`../Docs/`](../Docs/) gepflegt. Bei neuen relevanten Erkenntnissen dort ergänzen, nicht nur hier.
